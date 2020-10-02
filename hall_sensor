@@ -1,0 +1,29 @@
+const int pulsesPerRev = 1; //How many times sensor is triggered during one revolution
+long int last = 0; //The last time sensor was triggered
+int v = 0; //calculation for rpm
+int distance = 0; //for odometer
+const int radius = 0.335; //radius of bike wheel in metres
+const int pi = 3.14159265359;
+
+
+void setup() {
+  pinMode(2, INPUT); //assuming using pin2 for interrupt, will have to double check tho
+  attachInterrupt(digitalPinToInterrupt(2),detection,RISING);
+
+}
+
+void loop() {
+ Serial.print(v,0);
+ Serial.print(distance,2);
+
+}
+
+void detection() {
+  long int now = (long int)millis();
+  long int period = now - last;
+  if (period > 120) { //this ensures the speed is accurate to around 100 km/h ~ 500 rpm
+    v = (7200*pi*radius)/(period*pulsesPerRev); // Gives velocity in km/h (this is shortened maths)
+    last = now;
+  }
+  distance += (2*pi*radius)/1000; //gives distance in km 
+}
